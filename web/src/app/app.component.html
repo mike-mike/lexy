@@ -1,0 +1,98 @@
+<div class="phone-frame">
+  <div class="screen">
+    <header class="levels">
+      @for (l of levels; track l.id) {
+        <button
+          class="level-btn"
+          [class.active]="level === l.id"
+          (click)="level = l.id">
+          {{ l.label }}
+        </button>
+      }
+    </header>
+
+    <main class="chat-area">
+      @if (messages().length === 0 && !loading()) {
+        <p class="hint">Tap mic → speak → say "OK GPT" or tap again</p>
+      }
+      @for (msg of messages(); track $index) {
+        <div class="message" [class.user]="msg.role === 'user'" [class.assistant]="msg.role === 'assistant'">
+          <span class="content">{{ msg.content }}</span>
+          @if (msg.role === 'assistant' && currentSpeaking === msg.content) {
+            <span class="speaking-dot">●</span>
+          }
+        </div>
+      }
+      @if (loading()) {
+        <div class="message assistant loading">
+          <span class="content">...</span>
+        </div>
+      }
+      <div #chatEnd class="chat-end"></div>
+    </main>
+
+    <footer class="bottom-bar">
+      @if (error) {
+        <p class="error">{{ error }}</p>
+      }
+
+      <div class="indicators">
+        @if (recording) {
+          <div class="voice-meter">
+            <div class="voice-bar" [style.height.%]="voiceLevel()"></div>
+          </div>
+        }
+        <div class="phase-badge" [class]="phase()">
+          {{ phaseLabel() }}
+        </div>
+      </div>
+
+      @if (status) {
+        <div class="status-log">
+          <code>{{ status }}</code>
+        </div>
+      }
+
+      <div class="input-row">
+        <input
+          type="text"
+          #textInput
+          placeholder="Or type here..."
+          (keydown.enter)="sendText(textInput)"
+          class="text-input" />
+        <button class="send-btn" (click)="sendText(textInput)">Send</button>
+      </div>
+
+      <div class="mic-area">
+      <button
+        class="repeat-btn"
+        [disabled]="!lastAssistantMessage || loading()"
+        (click)="repeatLastPhrase()"
+        title="Repeat last phrase">
+        Repeat
+      </button>
+      <button
+        class="mic-btn"
+        [class.on]="recording"
+        [class.loading]="loading()"
+        [disabled]="loading()"
+        (click)="toggleMic()"
+        [attr.aria-label]="recording ? 'Stop recording' : 'Start recording'">
+        <svg class="mic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="23"/>
+          <line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+      </button>
+      <button
+        class="cancel-btn"
+        [disabled]="!recording"
+        (click)="cancelRecording()"
+        title="Cancel and start over">
+        Cancel
+      </button>
+    </div>
+    </footer>
+  </div>
+</div>

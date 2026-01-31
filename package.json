@@ -1,0 +1,11 @@
+{
+  "name": "lexy",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": ["api", "web"],
+  "scripts": {
+    "api": "npm run dev --workspace=api",
+    "web": "npm run start --workspace=web",
+    "dev": "npm run api & npm run web"
+  }
+}
